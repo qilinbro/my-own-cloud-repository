@@ -118,22 +118,54 @@
             line-height: 1.4;
         }
         
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar-inner {
+            height: 100%;
+            background-color: #1890ff;
+            transition: width 0.3s ease;
+        }
+
         .options {
             display: grid;
-            gap: 15px;
+            gap: 20px;
+            margin: 30px 0;
         }
         
-        button {
-            padding: 15px 20px;
+        .options button {
+            padding: 25px 30px;
             border: 2px solid transparent;
-            border-radius: 8px;
+            border-radius: 12px;
             background-color: rgba(24, 144, 255, 0.9);
             color: white;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 1.1em;
+            font-size: 1.3em;
             font-weight: 500;
             text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .options button:disabled {
+            background-color: rgba(0, 0, 0, 0.2);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .options button.correct-answer {
+            background-color: rgba(82, 196, 26, 0.9);
+        }
+
+        .options button.wrong-answer {
+            background-color: rgba(245, 34, 45, 0.9);
         }
         
         button:hover {
@@ -313,6 +345,9 @@
                         <span class="incorrect">错误：${incorrectCount}</span>
                     </div>
                 </div>
+                <div class="progress-bar">
+                    <div class="progress-bar-inner" style="width: ${(currentQuestion / questions.length) * 100}%"></div>
+                </div>
                 <div class="question current">
                     <h3>问题 ${currentQuestion + 1}/10：${question.question}</h3>
                     <div class="options">
@@ -337,17 +372,27 @@
                 incorrectCount++;
             }
             
+            const buttons = document.querySelectorAll('.options button');
+            buttons.forEach((btn, index) => {
+                btn.disabled = true;
+                if (index === selectedIndex && !isCorrect) {
+                    btn.classList.add('wrong-answer');
+                }
+                if (index === question.correct) {
+                    setTimeout(() => {
+                        btn.classList.add('correct-answer');
+                    }, 300);
+                }
+            });
+
             // 显示答案反馈
             const feedbackDiv = document.createElement('div');
             feedbackDiv.className = `answer-feedback ${isCorrect ? 'correct' : 'incorrect'}`;
             feedbackDiv.innerHTML = isCorrect
                 ? '<b>✓ 回答正确！</b>'
-                : `<b>✗ 回答错误</b><br>正确答案是：${question.options[question.correct]}`;
+                : `<b>✗ 回答错误</b>`;
             
             document.querySelector('.question.current').appendChild(feedbackDiv);
-            
-            // 禁用所有按钮
-            document.querySelectorAll('.options button').forEach(btn => btn.disabled = true);
             
             // 延迟后进入下一题
             setTimeout(() => {
