@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>趣味问答</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f2f5;
+        }
+        .quiz-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .question {
+            margin-bottom: 20px;
+            display: none;
+        }
+        .current {
+            display: block;
+        }
+        .options {
+            display: grid;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            background-color: #1890ff;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #096dd9;
+        }
+        #result {
+            margin-top: 20px;
+            text-align: center;
+        }
+        #reward-image {
+            max-width: 100%;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>趣味问答</h1>
+        <div id="quiz"></div>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "太阳系中最大的行星是什么？",
+                options: ["木星", "土星", "地球", "天王星"],
+                correct: 0
+            },
+            {
+                question: "中国四大发明不包括以下哪个？",
+                options: ["指南针", "火药", "印刷术", "瓷器"],
+                correct: 3
+            },
+            {
+                question: "长江最长的支流是哪条河？",
+                options: ["嘉陵江", "汉江", "湘江", "雅砻江"],
+                correct: 1
+            },
+            {
+                question: "下列哪个不是中国的四大名著？",
+                options: ["红楼梦", "西游记", "聊斋志异", "三国演义"],
+                correct: 2
+            },
+            {
+                question: "人体最大的器官是什么？",
+                options: ["心脏", "肝脏", "皮肤", "肺"],
+                correct: 2
+            },
+            {
+                question: "世界上最深的海沟是什么？",
+                options: ["马里亚纳海沟", "波多黎各海沟", "日本海沟", "菲律宾海沟"],
+                correct: 0
+            },
+            {
+                question: "以下哪种动物不是哺乳动物？",
+                options: ["蝙蝠", "鸭嘴兽", "企鹅", "海豚"],
+                correct: 2
+            },
+            {
+                question: "下列哪个不是我国的一级行政区？",
+                options: ["广东省", "苏州市", "西藏自治区", "重庆市"],
+                correct: 1
+            },
+            {
+                question: "地球自转一周是多少小时？",
+                options: ["12小时", "24小时", "36小时", "48小时"],
+                correct: 1
+            },
+            {
+                question: "汉字中的森字是由几个木字组成的？",
+                options: ["2个", "3个", "4个", "5个"],
+                correct: 1
+            }
+        ];
+
+        const rewardImages = [
+            "https://picsum.photos/400/300",
+            "https://source.unsplash.com/400x300/?nature",
+            "https://source.unsplash.com/400x300/?animal",
+            "https://source.unsplash.com/400x300/?landscape"
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+
+        function showQuestion() {
+            const quizDiv = document.getElementById('quiz');
+            const question = questions[currentQuestion];
+            
+            let html = `
+                <div class="question current">
+                    <h3>问题 ${currentQuestion + 1}/10：${question.question}</h3>
+                    <div class="options">
+                        ${question.options.map((option, index) => `
+                            <button onclick="checkAnswer(${index})">${option}</button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            quizDiv.innerHTML = html;
+        }
+
+        function checkAnswer(selectedIndex) {
+            const question = questions[currentQuestion];
+            if (selectedIndex === question.correct) {
+                score++;
+            }
+            
+            currentQuestion++;
+            
+            if (currentQuestion < questions.length) {
+                showQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            const resultDiv = document.getElementById('result');
+            const percentage = (score / questions.length) * 100;
+            
+            let html = `
+                <h2>测试完成！</h2>
+                <p>你答对了 ${score} 道题，正确率 ${percentage}%</p>
+            `;
+            
+            if (score >= 8) {
+                const randomImage = rewardImages[Math.floor(Math.random() * rewardImages.length)];
+                html += `
+                    <p>恭喜你获得奖励图片！</p>
+                    <img id="reward-image" src="${randomImage}" alt="奖励图片">
+                `;
+            } else {
+                html += `
+                    <p>再接再厉！答对8题或以上可以获得奖励图片哦～</p>
+                    <button onclick="restartQuiz()">重新开始</button>
+                `;
+            }
+            
+            resultDiv.innerHTML = html;
+            document.getElementById('quiz').innerHTML = '';
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            document.getElementById('result').innerHTML = '';
+            showQuestion();
+        }
+
+        // 开始测试
+        showQuestion();
+    </script>
+</body>
+</html>
