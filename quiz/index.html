@@ -7,51 +7,175 @@
     <style>
         body {
             font-family: 'Microsoft YaHei', sans-serif;
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f0f2f5;
+            background: none;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-size: cover;
+            background-position: center;
+            transition: opacity 1s ease-in-out;
+            z-index: -2;
+        }
+
+        .background-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(3px);
+            z-index: -1;
         }
         .quiz-container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+            backdrop-filter: blur(5px);
+            margin-top: 40px;
+            min-height: 500px;
         }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            font-size: 1.2em;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .correct {
+            color: #52c41a;
+        }
+
+        .incorrect {
+            color: #f5222d;
+        }
+
+        .answer-feedback {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .answer-feedback.correct {
+            background: rgba(82, 196, 26, 0.1);
+            border: 1px solid #52c41a;
+        }
+
+        .answer-feedback.incorrect {
+            background: rgba(245, 34, 45, 0.1);
+            border: 1px solid #f5222d;
+        }
+        
+        .quiz-container h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        
         .question {
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             display: none;
+            animation: fadeIn 0.5s ease-in-out;
         }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
         .current {
             display: block;
         }
+        
+        .question h3 {
+            font-size: 1.5em;
+            color: #1f1f1f;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+        
         .options {
             display: grid;
-            gap: 10px;
+            gap: 15px;
         }
+        
         button {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            background-color: #1890ff;
+            padding: 15px 20px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            background-color: rgba(24, 144, 255, 0.9);
             color: white;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+            font-weight: 500;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
         }
+        
         button:hover {
-            background-color: #096dd9;
+            background-color: rgba(9, 109, 217, 0.95);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
         #result {
-            margin-top: 20px;
+            margin-top: 30px;
             text-align: center;
+            animation: fadeIn 0.5s ease-in-out;
         }
+        
+        #result h2 {
+            color: #333;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        
+        #result p {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
         #reward-image {
             max-width: 100%;
-            margin-top: 20px;
+            margin-top: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            animation: fadeIn 1s ease-in-out;
         }
     </style>
 </head>
 <body>
+    <div class="background"></div>
+    <div class="background-overlay"></div>
     <div class="quiz-container">
         <h1>趣味问答</h1>
         <div id="quiz"></div>
@@ -112,21 +236,83 @@
             }
         ];
 
-        const rewardImages = [
-            "https://picsum.photos/400/300",
-            "https://source.unsplash.com/400x300/?nature",
-            "https://source.unsplash.com/400x300/?animal",
-            "https://source.unsplash.com/400x300/?landscape"
+        const backgroundImages = [
+            "../getnleman/ycy_image_20250605_084027.webp",
+            "../getnleman/ycy_image_20250605_085116.webp",
+            "../getnleman/ycy_image_20250605_085122.webp",
+            "../getnleman/ycy_image_20250605_085129.webp",
+            "../getnleman/ycy_image_20250605_085243.webp",
+            "../getnleman/ycy_image_20250605_085251.webp",
+            "../getnleman/ycy_image_20250605_092331.webp",
+            "../getnleman/ycy_image_20250605_092339.webp",
+            "../getnleman/ycy_image_20250605_092347.webp",
+            "../getnleman/ycy_image_20250605_092356.webp"
         ];
+
+        const rewardImages = [
+            "../getnleman/ycy_image_20250605_092405.webp",
+            "../getnleman/ycy_image_20250605_092412.webp",
+            "../getnleman/ycy_image_20250605_092421.webp",
+            "../getnleman/ycy_image_20250605_092428.webp",
+            "../getnleman/ycy_image_20250605_092315.webp"
+        ];
+
+        let lastIndex = -1;
+        const bg1 = document.querySelector('.background');
+        let currentBg = bg1;
+        
+        function updateBackground() {
+            let nextIndex;
+            do {
+                nextIndex = Math.floor(Math.random() * backgroundImages.length);
+            } while (nextIndex === lastIndex);
+            
+            const nextImage = new Image();
+            nextImage.onload = function() {
+                const newBg = currentBg.cloneNode(false);
+                newBg.style.opacity = '0';
+                newBg.style.backgroundImage = `url('${backgroundImages[nextIndex]}')`;
+                document.body.insertBefore(newBg, currentBg);
+                
+                // 触发重排
+                void newBg.offsetWidth;
+                
+                newBg.style.opacity = '1';
+                currentBg.style.opacity = '0';
+                
+                setTimeout(() => {
+                    currentBg.remove();
+                    currentBg = newBg;
+                }, 1000);
+            };
+            nextImage.src = backgroundImages[nextIndex];
+            lastIndex = nextIndex;
+        }
+
+        // 初始化背景
+        updateBackground();
+
+        // 每5秒更换一次背景
+        setInterval(updateBackground, 5000);
 
         let currentQuestion = 0;
         let score = 0;
+        let correctCount = 0;
+        let incorrectCount = 0;
 
         function showQuestion() {
             const quizDiv = document.getElementById('quiz');
             const question = questions[currentQuestion];
             
             let html = `
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="correct">正确：${correctCount}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="incorrect">错误：${incorrectCount}</span>
+                    </div>
+                </div>
                 <div class="question current">
                     <h3>问题 ${currentQuestion + 1}/10：${question.question}</h3>
                     <div class="options">
@@ -142,17 +328,36 @@
 
         function checkAnswer(selectedIndex) {
             const question = questions[currentQuestion];
-            if (selectedIndex === question.correct) {
+            const isCorrect = selectedIndex === question.correct;
+            
+            if (isCorrect) {
                 score++;
-            }
-            
-            currentQuestion++;
-            
-            if (currentQuestion < questions.length) {
-                showQuestion();
+                correctCount++;
             } else {
-                showResult();
+                incorrectCount++;
             }
+            
+            // 显示答案反馈
+            const feedbackDiv = document.createElement('div');
+            feedbackDiv.className = `answer-feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedbackDiv.innerHTML = isCorrect
+                ? '<b>✓ 回答正确！</b>'
+                : `<b>✗ 回答错误</b><br>正确答案是：${question.options[question.correct]}`;
+            
+            document.querySelector('.question.current').appendChild(feedbackDiv);
+            
+            // 禁用所有按钮
+            document.querySelectorAll('.options button').forEach(btn => btn.disabled = true);
+            
+            // 延迟后进入下一题
+            setTimeout(() => {
+                currentQuestion++;
+                if (currentQuestion < questions.length) {
+                    showQuestion();
+                } else {
+                    showResult();
+                }
+            }, 2000);
         }
 
         function showResult() {
@@ -161,7 +366,15 @@
             
             let html = `
                 <h2>测试完成！</h2>
-                <p>你答对了 ${score} 道题，正确率 ${percentage}%</p>
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="correct">正确：${correctCount}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="incorrect">错误：${incorrectCount}</span>
+                    </div>
+                </div>
+                <p>最终得分：${score} 道题，正确率 ${percentage.toFixed(1)}%</p>
             `;
             
             if (score >= 8) {
