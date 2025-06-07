@@ -1,0 +1,7 @@
+<swiper class="swiper-container" indicator-dots="{{true}}" 
+        autoplay="{{true}}" interval="{{3000}}" duration="{{1000}}">
+  <swiper-item wx:for="{{bannerList}}" wx:key="index">
+    <image src="{{item.imageUrl}}" class="slide-image" mode="aspectFill" 
+           bindtap="bannerClick" data-index="{{index}}"/>
+  </swiper-item>
+</swiper>
