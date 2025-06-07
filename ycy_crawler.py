@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # 设置保存目录（使用绝对路径）
-SAVE_DIR = 'D:/code_repository/getnleman'
+SAVE_DIR = 'D:/getnleman'
 
 def fetch_image(url, retries=3):
     """获取图片内容"""
